@@ -6,7 +6,6 @@ on:
   #  - cron: '*/15 6-22 * * *'
 jobs:
   Setup:
-    name: Setup environment
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,11 +18,7 @@ jobs:
           cache-dependency-path: 'requirements.txt'
       - name: Install python dependencies
         run: pip install -r requirements.txt
-  Collect:
-    name: Collect data
-    needs: Setup
-    runs-on: ubuntu-latest
-    steps:
       - name: Collect data
-        run: python src/test.py
+        run: python src/collect.py
+  
 
