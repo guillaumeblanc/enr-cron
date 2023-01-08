@@ -18,3 +18,6 @@ jobs:
           cache-dependency-path: 'requirements.txt'
       - name: Install python dependencies
         run: pip install -r requirements.txt
+      - name: Collect data
+        run: python src/test.py
+
