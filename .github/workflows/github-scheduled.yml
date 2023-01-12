@@ -5,11 +5,11 @@ on:
   #schedule:
   #  - cron: '*/15 6-22 * * *'
 jobs:
-  Setup:
+  Collect:
     runs-on: ubuntu-latest
     env:
       FUSIONSOLAR_USER: ${{ secrets.FUSIONSOLAR_USER }}
-      FUSIONSOLAR_PASSWORD: ${{ secrets.SOLAR_PASSWORD }}
+      FUSIONSOLAR_PASSWORD: ${{ secrets.FUSIONSOLAR_PASSWORD }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
