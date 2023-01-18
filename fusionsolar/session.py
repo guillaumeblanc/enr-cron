@@ -59,11 +59,14 @@ def logged(func):
 
     @functools.wraps(func)
     def wrap(*args, **kwargs):
+        login_again = False
         while True:
+            if (login_again):
+                args[0].login()
             try:
                 return func(*args, **kwargs)
             except _305_NotLogged:
-                args[0].login()
+                login_again = True
 
     return wrap
 

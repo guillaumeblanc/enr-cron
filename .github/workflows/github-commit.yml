@@ -3,7 +3,7 @@ on:
   push:
   pull_request:
 jobs:
-  Collect:
+  UnitTest:
     runs-on: ubuntu-latest
     env:
       FUSIONSOLAR_USER: ${{ secrets.FUSIONSOLAR_USER }}
@@ -20,7 +20,7 @@ jobs:
           cache: 'pip'
       - name: Install python dependencies
         run: pip install -r requirements.txt
-      - name: Collect data
+      - name: Test
         run: python -m unittest
   
 

@@ -11,4 +11,3 @@ if os.environ.get('FUSIONSOLAR_PASSWORD') is None:
     logging.error('Missing environment variable FUSIONSOLAR_PASSWORD')
     sys.exit(os.EX_DATAERR)
 password = os.environ.get('FUSIONSOLAR_PASSWORD', 'unkown')
-s

@@ -2,9 +2,24 @@
 import os
 import logging
 import unittest
+import functools
 from . import session
+# import session
 
 logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
+
+def frequency_limit(func):
+    '''Handle frequency limits cases, which cannot ben considered as fails.'''
+
+    @functools.wraps(func)
+    def wrap(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except session.FrequencyLimit:
+            logging.warning(
+                'Couldn\'t complete test due to exceeding frequency limits.')
+
+    return wrap
 
 
 class TestLogin(unittest.TestCase):
@@ -21,11 +36,13 @@ class TestLogin(unittest.TestCase):
             with session.Session(user=self.invalid_user, password=self.invalid_password):
                 pass
 
+    @frequency_limit
     def test_invalid_password(self):
         with self.assertRaises(session.LoginFailed) as context:
             with session.Session(user=self.user, password=self.invalid_password):
                 pass
 
+    @frequency_limit
     def test_request(self):
         with session.Session(user=self.user, password=self.password) as s:
             with session.FusionRequest(session=s) as fr:
@@ -38,6 +55,7 @@ class TestLogin(unittest.TestCase):
             with session.FusionRequest(session=s) as fr:
                 stations = fr.get_station_list()
 
+    @frequency_limit
     def test_not_logged_request(self):
         s = session.Session(user=self.user, password=self.password)
         fr = session.FusionRequest(session=s)
