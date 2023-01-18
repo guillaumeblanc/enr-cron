@@ -6,11 +6,9 @@ import functools
 from . import session
 # import session
 
-logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 
 def frequency_limit(func):
     '''Handle frequency limits cases, which cannot ben considered as fails.'''
-
     @functools.wraps(func)
     def wrap(*args, **kwargs):
         try:
@@ -18,18 +16,26 @@ def frequency_limit(func):
         except session.FrequencyLimit:
             logging.warning(
                 'Couldn\'t complete test due to exceeding frequency limits.')
-
     return wrap
 
 
 class TestLogin(unittest.TestCase):
 
-    def setUp(self) -> None:
-        self.invalid_user = 'Invalid93#!'
-        self.user = os.environ.get('FUSIONSOLAR_USER', self.invalid_user)
-        self.invalid_password = 'Invalid99#!'
-        self.password = os.environ.get(
-            'FUSIONSOLAR_PASSWORD', self.invalid_password)
+    @classmethod
+    def setUpClass(cls):
+
+        cls.invalid_user = 'Invalid93#!'
+        cls.user = os.environ['FUSIONSOLAR_USER']
+        cls.invalid_password = 'Invalid99#!'
+        cls.password = os.environ['FUSIONSOLAR_PASSWORD']
+
+        # Create session and login
+        cls.session = session.Session(user=cls.user, password=cls.password)
+        cls.session.login()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.session.logout()
 
     def test_invalid_user(self):
         with self.assertRaises(session.LoginFailed) as context:
@@ -42,18 +48,17 @@ class TestLogin(unittest.TestCase):
             with session.Session(user=self.user, password=self.invalid_password):
                 pass
 
-    @frequency_limit
-    def test_request(self):
-        with session.Session(user=self.user, password=self.password) as s:
-            with session.FusionRequest(session=s) as fr:
-                stations = fr.get_station_list()
-
     def test_invalid_user_request(self):
         with self.assertRaises(session.LoginFailed) as context:
             s = session.Session(user=self.invalid_user,
                                 password=self.invalid_password)
             with session.FusionRequest(session=s) as fr:
                 stations = fr.get_station_list()
+
+    @frequency_limit
+    def test_request(self):
+        with session.FusionRequest(session=self.session) as fr:
+            stations = fr.get_station_list()
 
     @frequency_limit
     def test_not_logged_request(self):

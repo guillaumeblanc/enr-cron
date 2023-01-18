@@ -118,7 +118,7 @@ class Session:
 
     @exceptions_sanity
     def logout(self) -> None:
-        '''Logout to base url'''
+        '''Logout from base url'''
         self.session = requests.session()
 
     @exceptions_sanity
