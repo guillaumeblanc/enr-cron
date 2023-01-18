@@ -1,0 +1,26 @@
+name: GitHub commit action
+on:
+  push:
+  pull_request:
+jobs:
+  Collect:
+    runs-on: ubuntu-latest
+    env:
+      FUSIONSOLAR_USER: ${{ secrets.FUSIONSOLAR_USER }}
+      FUSIONSOLAR_PASSWORD: ${{ secrets.FUSIONSOLAR_PASSWORD }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install python dependencies
+        run: pip install -r requirements.txt
+      - name: Collect data
+        run: python -m unittest
+  
+

@@ -1,16 +1,98 @@
 import logging
 import os
 import requests
-import time
+import json
 import functools
 
-# Based on doucmentation iMaster NetEco V600R023C00 Northbound Interface Reference-V6(SmartPVMS)
+# Based on documentation iMaster NetEco V600R023C00 Northbound Interface Reference-V6(SmartPVMS)
 # https://support.huawei.com/enterprise/en/doc/EDOC1100261860
 
-logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 
-user = 'robot_esl' #os.environ.get('FUSIONSOLAR_USER', 'unkown')
-password = os.environ.get('FUSIONSOLAR_PASSWORD', 'unkown')
+# Public API exception
+
+class FusionException(Exception):
+    '''Undefined Fusion exception'''
+
+
+class FusionPublicException(FusionException):
+    '''Undefined public fusion exception'''
+
+
+class LoginFailed(FusionPublicException):
+    '''Login failed. Verify user and password of Northbound API account.'''
+
+
+class FrequencyLimit(FusionPublicException):
+    '''(407) The interface access frequency is too high.'''
+
+# TODO    401 You do not have the related data interface permission.
+
+
+# Internal exceptions, should not get out of module implementation
+
+class _FusionInternalException(FusionException):
+    '''Undefined internal fusion exception'''
+
+
+class _305_NotLogged(_FusionInternalException):
+    '''You are not in the login state. You need to log in again.'''
+
+
+def FailCodeToException(body):
+    switcher = {
+        305: _305_NotLogged,  # You are not in the login state.
+        407: FrequencyLimit,  # The interface access frequency is too high.
+        20001: LoginFailed,  # The third-party system ID does not exist.
+        20002: LoginFailed,  # The third-party system is forbidden.
+        20003: LoginFailed,  # The third-party system has expired.
+        30029: LoginFailed,  # Authentication failed.
+    }
+
+    # Returns the exception matching failCode, or FusionException by default
+    failCode = body.get('failCode', 0)
+    logging.debug('failCode ' + str(failCode) + ' received.')
+    return switcher.get(failCode, _FusionInternalException)(body)
+
+
+def logged(func):
+    '''Ensures user is logged, login again if necessary'''
+
+    @functools.wraps(func)
+    def wrap(*args, **kwargs):
+        while True:
+            try:
+                return func(*args, **kwargs)
+            except _305_NotLogged:
+                args[0].login()
+
+    return wrap
+
+
+def validate(func):
+    '''Ensures requests succeeds'''
+
+    @functools.wraps(func)
+    def wrap(*args, **kwargs) -> tuple[requests.Response, dict]:
+        response = func(*args, **kwargs)
+        body = response.json()
+        if not body.get('success', False):
+            raise FailCodeToException(body)
+        return response, body
+    return wrap
+
+
+def exceptions_sanity(func):
+    '''Ensures sanity of exceptions raised to the public API. No internal exception should get to public side.'''
+
+    @functools.wraps(func)
+    def wrap(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except _FusionInternalException as e:
+            logging.exception()
+            raise FusionException()
+
+    return wrap
 
 
 class Session:
@@ -21,90 +103,69 @@ class Session:
         self.session = requests.session()
         self.session.headers.update(
             {'Connection': 'keep-alive', 'Content-Type': 'application/json'})
-        self.token_expiration = 0
 
+    @exceptions_sanity
     def __enter__(self):
         self.login()
         return self
 
+    @exceptions_sanity
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.logout()
 
-    def login(self) :
+    @exceptions_sanity
+    def logout(self) -> None:
+        '''Logout to base url'''
+        self.session = requests.session()
+
+    @exceptions_sanity
+    def login(self) -> None:
         '''Login to base url'''
 
-        # Clears if already logged in
-        self.session.cookies.clear()
-        
         try:
             # Posts login request
-            response = self._post(endpoint='login', json={'userName': user, 'systemCode': password})
-
+            self.session.cookies.clear()
+            response, body = self._raw_post(endpoint='login', json={
+                'userName': self.user, 'systemCode': self.password})
             # Login succeeded, stores authentication token
-            self.session.headers.update({'XSRF-TOKEN': response.cookies.get(name='XSRF-TOKEN')})
+            self.session.headers.update(
+                {'XSRF-TOKEN': response.cookies.get(name='XSRF-TOKEN')})
+        except _305_NotLogged:
+            # Login failed can also be raised directly for 20001, 20002, 20003 failCodes.
+            raise LoginFailed()
+        except json.JSONDecodeError:
+            # FusionSolar NBI sends an empty json when user is unknown. It's not the expected behavior described by documentation 7.1.1.
+            # It's caught here with JSONDecodeError exception.
+            raise LoginFailed()
 
-            # According to 7.1.1 The validity period of XSRF-TOKEN is 30 minutes.
-            self.token_expiration = 30*60
-        except Exception as e:
-            logging.error(e)
-            raise ValueError('Login failed. Invalid user or password.')
+    @exceptions_sanity  # Must be the first decorator.
+    @logged
+    def post(self, endpoint, json={}) -> None:
+        '''Executes POST request'''
+        return self._raw_post(endpoint, json)
 
-    def logout(self) :
-        '''Logout to base url'''
-
-    def succeeds(func):
-        '''Ensures requests succeeds'''
-
-        @functools.wraps(func)
-        def wrap(*args, **kwargs):
-            self = args[0]
-            try:
-                response = func(*args, **kwargs)
-                body = response.json()
-                success = body.get('success', False)
-                if success:
-                    return body
-                else:
-                    raise Exception(body)
-            except Exception as e:
-                raise e
-        return wrap
-    
-    @succeeds
-    def _post(self, endpoint, json):
+    @validate
+    def _raw_post(self, endpoint, json={}) -> requests.Response:
         '''Executes POST request'''
         try:
-            response = requests.post(url=self.base_url + endpoint, json=json)
+            response = self.session.post(
+                url=self.base_url + endpoint, json=json)
             response.raise_for_status()
-        except Exception as e:
+            return response
+        except Exception:
             # Forward all other exceptions/errors
             raise
-        else:
-            return response
 
-"""
-def connection_retry(func):
-    '''Automatic retry on request timeout'''
 
-    kMaxRetries = 2
-    kRetryDelay = 1
+class FusionRequest:
+    def __init__(self, session: Session):
+        self.session = session
 
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        self = args[0]
-        i = 0
-        while True:
-            try:
-                return func(*args, **kwargs)
-            except requests.exceptions.ConnectTimeout as e:
-                logging.info(e)
-                if i >= self.kMaxRetries :
-                    logging.error('Max retries exceeded.')
-                    raise e
+    def __enter__(self):
+        return self
 
-                # Will retry
-                i += 1
-                time.sleep(self.kRetryDelay)
-                continue
-    return wrapper
-"""
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    def get_station_list(self):
+        response, body = self.session.post(endpoint='getStationList')
