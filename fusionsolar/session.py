@@ -132,11 +132,11 @@ class Session:
                 {'XSRF-TOKEN': response.cookies.get(name='XSRF-TOKEN')})
         except _305_NotLogged:
             # Login failed can also be raised directly for 20001, 20002, 20003 failCodes.
-            raise LoginFailed()
+            raise LoginFailed() from None
         except json.JSONDecodeError:
             # FusionSolar NBI sends an empty json when user is unknown. It's not the expected behavior described by documentation 7.1.1.
             # It's caught here with JSONDecodeError exception.
-            raise LoginFailed()
+            raise LoginFailed() from None
 
     @exceptions_sanity  # Must be the first decorator.
     @logged
