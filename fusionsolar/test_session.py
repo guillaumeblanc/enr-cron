@@ -22,6 +22,7 @@ def frequency_limit(func):
 class TestLogin(unittest.TestCase):
 
     @classmethod
+    @frequency_limit
     def setUpClass(cls):
 
         cls.invalid_user = 'Invalid93#!'
@@ -34,6 +35,7 @@ class TestLogin(unittest.TestCase):
         cls.session.login()
 
     @classmethod
+    @frequency_limit
     def tearDownClass(cls):
         cls.session.logout()
 
