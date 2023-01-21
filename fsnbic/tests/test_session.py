@@ -5,7 +5,7 @@ import unittest
 import functools
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-from fusionsolar import session
+from fsnbic import session
 
 def frequency_limit(func):
     '''Handle frequency limits cases, which cannot ben considered as fails.'''
