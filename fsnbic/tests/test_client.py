@@ -37,18 +37,18 @@ class TestClient(unittest.TestCase):
             s = Session(user=self.invalid_user,
                                 password=self.invalid_password)
             with Client(session=s) as client:
-                stations = client.get_station_list()
+                plants = client.get_plant_list()
 
     @frequency_limit
     def test_not_logged_request(self):
         s = Session(user=self.user, password=self.password)
         client = Client(session=s)
-        stations = client.get_station_list()
+        plants = client.get_plant_list()
 
     @frequency_limit
     def test_request(self):
         with Client(session=self.session) as client:
-            stations = client.get_station_list()
+            plants = client.get_plant_list()
 
 
 if __name__ == '__main__':

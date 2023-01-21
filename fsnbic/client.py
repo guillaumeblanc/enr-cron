@@ -12,7 +12,7 @@ class Client:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
-    
-    def get_station_list(self):
+
+    def get_plant_list(self):
         response, body = self.session.post(endpoint='getStationList')
 
