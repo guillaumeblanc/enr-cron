@@ -46,9 +46,9 @@ def exceptions_sanity(func):
     def wrap(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except exception._FusionInternalException as e:
+        except exception._InternalException as e:
             logging.exception()
-            raise exception.FusionException()
+            raise exception.Exception()
 
     return wrap
 
