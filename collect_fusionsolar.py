@@ -18,9 +18,9 @@ try:
     with fsnbic.Client(session = fsnbic.Session(user, password)) as client:
         plants = client.get_plant_list()
         print(plants)
-except fsnbic.exception.LoginFailed:
+except fsnbic.LoginFailed:
     logging.error('Login failed. Verify user and password of Northbound API account.')
     pass
-except fsnbic.exception.FrequencyLimit:
+except fsnbic.FrequencyLimit:
     logging.error('The interface access frequency is too high.')
     pass
