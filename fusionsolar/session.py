@@ -50,7 +50,7 @@ def FailCodeToException(body):
 
     # Returns the exception matching failCode, or FusionException by default
     failCode = body.get('failCode', 0)
-    logging.debug('failCode ' + str(failCode) + ' received.')
+    logging.debug('failCode ' + str(failCode) + ' received with body: ' + str(body))
     return switcher.get(failCode, _FusionInternalException)(body)
 
 
@@ -160,7 +160,7 @@ class Session:
             raise
 
 
-class FusionRequest:
+class Client:
     def __init__(self, session: Session):
         self.session = session
 
@@ -172,3 +172,4 @@ class FusionRequest:
 
     def get_station_list(self):
         response, body = self.session.post(endpoint='getStationList')
+

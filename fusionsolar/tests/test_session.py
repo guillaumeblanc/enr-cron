@@ -1,11 +1,11 @@
-
 import os
+import sys
 import logging
 import unittest
 import functools
-from . import session
-# import session
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from fusionsolar import session
 
 def frequency_limit(func):
     '''Handle frequency limits cases, which cannot ben considered as fails.'''
@@ -54,18 +54,18 @@ class TestLogin(unittest.TestCase):
         with self.assertRaises(session.LoginFailed) as context:
             s = session.Session(user=self.invalid_user,
                                 password=self.invalid_password)
-            with session.FusionRequest(session=s) as fr:
+            with session.Client(session=s) as fr:
                 stations = fr.get_station_list()
 
     @frequency_limit
     def test_request(self):
-        with session.FusionRequest(session=self.session) as fr:
+        with session.Client(session=self.session) as fr:
             stations = fr.get_station_list()
 
     @frequency_limit
     def test_not_logged_request(self):
         s = session.Session(user=self.user, password=self.password)
-        fr = session.FusionRequest(session=s)
+        fr = session.Client(session=s)
         stations = fr.get_station_list()
 
 
