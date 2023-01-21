@@ -6,12 +6,13 @@ import functools
 
 # Needs add fsnbic parent to path to allow absolute import
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-from fsnbic import session
-from fsnbic import client
+from fsnbic.session import Session
+from fsnbic.client import Client
+from fsnbic import exception
 
 from fsnbic.tests.test_session import frequency_limit
 
-class TestLogin(unittest.TestCase):
+class TestClient(unittest.TestCase):
 
     @classmethod
     @frequency_limit
@@ -23,7 +24,7 @@ class TestLogin(unittest.TestCase):
         cls.password = os.environ['FUSIONSOLAR_PASSWORD']
 
         # Create session and login
-        cls.session = session.Session(user=cls.user, password=cls.password)
+        cls.session = Session(user=cls.user, password=cls.password)
         cls.session.login()
 
     @classmethod
@@ -32,21 +33,21 @@ class TestLogin(unittest.TestCase):
         cls.session.logout()
 
     def test_invalid_user_request(self):
-        with self.assertRaises(session.LoginFailed) as context:
-            s = session.Session(user=self.invalid_user,
+        with self.assertRaises(exception.LoginFailed) as context:
+            s = Session(user=self.invalid_user,
                                 password=self.invalid_password)
-            with session.Client(session=s) as client:
+            with Client(session=s) as client:
                 stations = client.get_station_list()
 
     @frequency_limit
     def test_not_logged_request(self):
-        s = session.Session(user=self.user, password=self.password)
-        client = session.Client(session=s)
+        s = Session(user=self.user, password=self.password)
+        client = Client(session=s)
         stations = client.get_station_list()
 
     @frequency_limit
     def test_request(self):
-        with session.Client(session=self.session) as client:
+        with Client(session=self.session) as client:
             stations = client.get_station_list()
 
 
