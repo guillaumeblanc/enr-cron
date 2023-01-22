@@ -9,10 +9,11 @@ Implementation is based on Huawei SmartPVMS [Northbound Interface Reference V6](
 
 ```python
 try:
-    with fsnbic.Client(session = fsnbic.Session(user, password)) as client:
+    with fsnbic.ClientSession(user=user, password=password) as client:
         plants = client.get_plant_list()
         print(plants)
-except fsnbic.exception.LoginFailed:
-    logging.error('Login failed. Verify user and password of Northbound API account.')
+except fsnbic.LoginFailed:
+    logging.error(
+        'Login failed. Verify user and password of Northbound API account.')
     pass
 ```

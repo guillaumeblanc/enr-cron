@@ -47,7 +47,8 @@ def exceptions_sanity(func):
         try:
             return func(*args, **kwargs)
         except exception._InternalException as e:
-            logging.exception()
+            logging.exception(
+                'Internal exceptions getting out of of the private code.')
             raise exception.Exception()
 
     return wrap
@@ -74,6 +75,12 @@ class Session:
     @exceptions_sanity
     def logout(self) -> None:
         '''Logout from base url'''
+        '''
+        try:
+            self._raw_post('logout')
+        except _305_NotLogged:
+            pass  # Already logout
+        '''
         self.session = requests.session()
 
     @exceptions_sanity
@@ -110,3 +117,8 @@ class Session:
         response.raise_for_status()
         return response
 
+    def get_plant_list(self):
+        # response, body = self.session.post(endpoint='getStationList')
+        # return body.get('data')
+        with open('fusionsolar/test_plant_list.json') as json_file:
+            return json.load(json_file)['data']['list']

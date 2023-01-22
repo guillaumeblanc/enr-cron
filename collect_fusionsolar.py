@@ -15,11 +15,12 @@ if os.environ.get('FUSIONSOLAR_PASSWORD') is None:
 password = os.environ.get('FUSIONSOLAR_PASSWORD', 'unkown')
 
 try:
-    with fsnbic.Client(session = fsnbic.Session(user, password)) as client:
+    with fsnbic.ClientSession(user=user, password=password) as client:
         plants = client.get_plant_list()
         print(plants)
 except fsnbic.LoginFailed:
-    logging.error('Login failed. Verify user and password of Northbound API account.')
+    logging.error(
+        'Login failed. Verify user and password of Northbound API account.')
     pass
 except fsnbic.FrequencyLimit:
     logging.error('The interface access frequency is too high.')
