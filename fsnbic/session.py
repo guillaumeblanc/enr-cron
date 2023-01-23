@@ -9,6 +9,7 @@ from . import exception
 # Based on documentation iMaster NetEco V600R023C00 Northbound Interface Reference-V6(SmartPVMS)
 # https://support.huawei.com/enterprise/en/doc/EDOC1100261860
 
+
 def logged(func):
     '''Ensures user is logged, login again if necessary'''
 
@@ -107,7 +108,8 @@ class Session:
     @logged
     def post(self, endpoint, json={}) -> None:
         '''Executes POST request'''
-        return self._raw_post(endpoint, json)
+        response, body = self._raw_post(endpoint, json)
+        return body
 
     @validate
     def _raw_post(self, endpoint, json={}) -> requests.Response:

@@ -15,7 +15,7 @@ class Client:
         pass
 
     def get_plant_list(self):
-        response, body = self.session.post(endpoint='getStationList')
+        return self.session.post(endpoint='getStationList')
 
 
 class ClientSession(Client):
