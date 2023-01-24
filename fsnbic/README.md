@@ -17,3 +17,8 @@ except fsnbic.LoginFailed:
         'Login failed. Verify user and password of Northbound API account.')
     pass
 ```
+
+# Running tests
+
+Testing requires a valid Northbound API account. Tests will look for two environment variables to get user account (FUSIONSOLAR_USER) and password FUSIONSOLAR_PASSWORD.
+In case of a fork, these same variables shall be added to github secrets in order for the CI to work.
