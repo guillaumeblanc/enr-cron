@@ -7,6 +7,7 @@ on:
 jobs:
   Collect:
     runs-on: ubuntu-latest
+    environment: Production
     env:
       FUSIONSOLAR_USER: ${{ secrets.FUSIONSOLAR_USER }}
       FUSIONSOLAR_PASSWORD: ${{ secrets.FUSIONSOLAR_PASSWORD }}
