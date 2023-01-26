@@ -86,7 +86,10 @@ class Session:
 
     @exceptions_sanity
     def login(self) -> None:
-        '''Login to base url'''
+        '''
+        Login to base url
+        See documentation: https://support.huawei.com/enterprise/en/doc/EDOC1100261860/9e1a18d2/login-interface
+        '''
 
         try:
             # Posts login request

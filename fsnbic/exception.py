@@ -1,7 +1,7 @@
 import logging
 
 # Based on documentation iMaster NetEco V600R023C00 Northbound Interface Reference-V6(SmartPVMS)
-# https://support.huawei.com/enterprise/en/doc/EDOC1100261860
+# https://support.huawei.com/enterprise/en/doc/EDOC1100261860/787d54d9/error-code-list
 
 
 # Public API exception
@@ -47,4 +47,4 @@ def FailCodeToException(body):
     failCode = body.get('failCode', 0)
     logging.debug('failCode ' + str(failCode) +
                   ' received with body: ' + str(body))
-    return switcher.get(failCode, _InternalException)(body)
+    return switcher.get(failCode, _InternalException)(failCode, body)

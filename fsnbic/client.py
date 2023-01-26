@@ -2,6 +2,7 @@ import logging
 import os
 
 from . import session
+from . import exception
 
 
 class Client:
@@ -14,22 +15,28 @@ class Client:
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
 
-    # Get basic plants information.
-    # Implementation wraps a call to the Plant List Interface, as documented in 7.1.3
-    def get_plant_list(self):
+    def get_plant_list(self) -> dict :
+        '''
+        Get basic plants information.
+        Implementation wraps a call to the Plant List Interface, see https://support.huawei.com/enterprise/en/doc/EDOC1100261860/4217ab29/plant-list-interface
+        '''
         return self.session.post(endpoint='getStationList')['data']
 
-    # Get real-time plant data by plant ID set.
-    # Implementation wraps a call to the Plant Data Interfaces, as documented in 7.1.4
-    # Plant IDs can be obtained by querying get_plant_list, they are stationCode parameters.
-    # Data of a maximum of 100 plants can be queried at a time.
-    # For details about the data list that can be queried using this interface, see 7.2.1 Interface for Real-time Plant Data.
-    def get_plant_data(self, plants):  # : list(str)
-        # {"stationCodes": "BA4372D08E014822AB065017416F254C,5D02E8B40AD342159AC8D8A2BCD4FAB5"}'
-        plants_json = "{'stationCodes':''}"
+    def get_plant_data(self, plants) -> dict :  # : list(str)
+        '''
+        Get real-time plant data by plant ID set.
+        Implementation wraps a call to the Plant Data Interfaces, see https://support.huawei.com/enterprise/en/doc/EDOC1100261860/cf4fb068/plant-data-interfaces
+        Plant IDs can be obtained by querying get_plant_list, they are stationCode parameters.
+        Data of a maximum of 100 plants can be queried at a time.
+        For details about the data list that can be queried using this interface, see https://support.huawei.com/enterprise/en/doc/EDOC1100261860/c83ecf37/interface-for-real-time-plant-data.
+        '''
+        if not plants:
+            return {}
+
+        plants_json = {'stationCodes':''}
         try:
-            return self.session.post(endpoint='getKpiStationHour', json=plants_json)
-        except Exception as e:
+            return self.session.post(endpoint='getStationRealKpi', json=plants_json)
+        except exception.Exception as e:
             raise
 
 
