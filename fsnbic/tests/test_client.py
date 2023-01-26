@@ -35,7 +35,7 @@ class TestClient(unittest.TestCase):
     def test_invalid_user_request(self):
         with self.assertRaises(exception.LoginFailed) as context:
             s = Session(user=self.invalid_user,
-                                password=self.invalid_password)
+                        password=self.invalid_password)
             with Client(session=s) as client:
                 plants = client.get_plant_list()
 
@@ -48,7 +48,8 @@ class TestClient(unittest.TestCase):
     @frequency_limit
     def test_request(self):
         with Client(session=self.session) as client:
-            plants = client.get_plant_list()
+            #plants = client.get_plant_list()
+            client.get_plant_data(list())
 
 
 if __name__ == '__main__':
