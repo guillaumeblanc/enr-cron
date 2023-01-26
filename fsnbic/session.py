@@ -9,6 +9,7 @@ from . import exception
 # Based on documentation iMaster NetEco V600R023C00 Northbound Interface Reference-V6(SmartPVMS)
 # https://support.huawei.com/enterprise/en/doc/EDOC1100261860
 
+
 def logged(func):
     '''Ensures user is logged, login again if necessary'''
 
@@ -47,7 +48,8 @@ def exceptions_sanity(func):
         try:
             return func(*args, **kwargs)
         except exception._InternalException as e:
-            logging.exception()
+            logging.exception(
+                'Internal exceptions getting out of of the private code.')
             raise exception.Exception()
 
     return wrap
@@ -74,6 +76,12 @@ class Session:
     @exceptions_sanity
     def logout(self) -> None:
         '''Logout from base url'''
+        '''
+        try:
+            self._raw_post('logout')
+        except _305_NotLogged:
+            pass  # Already logout
+        '''
         self.session = requests.session()
 
     @exceptions_sanity
@@ -100,7 +108,8 @@ class Session:
     @logged
     def post(self, endpoint, json={}) -> None:
         '''Executes POST request'''
-        return self._raw_post(endpoint, json)
+        response, body = self._raw_post(endpoint, json)
+        return body
 
     @validate
     def _raw_post(self, endpoint, json={}) -> requests.Response:
@@ -110,3 +119,8 @@ class Session:
         response.raise_for_status()
         return response
 
+    def get_plant_list(self):
+        # response, body = self.session.post(endpoint='getStationList')
+        # return body.get('data')
+        with open('fusionsolar/test_plant_list.json') as json_file:
+            return json.load(json_file)['data']['list']

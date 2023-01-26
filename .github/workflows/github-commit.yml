@@ -5,6 +5,7 @@ on:
 jobs:
   UnitTest:
     runs-on: ubuntu-latest
+    environment: Development
     env:
       FUSIONSOLAR_USER: ${{ secrets.FUSIONSOLAR_USER }}
       FUSIONSOLAR_PASSWORD: ${{ secrets.FUSIONSOLAR_PASSWORD }}

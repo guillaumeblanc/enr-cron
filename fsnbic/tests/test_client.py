@@ -38,7 +38,8 @@ class TestClient(unittest.TestCase):
     @frequency_limit
     def test_request(self):
         with fsnbic.Client(session=self.session) as client:
-            plants = client.get_plant_list()
+            #plants = client.get_plant_list()
+            client.get_plant_data(list())
 
 
 if __name__ == '__main__':

@@ -9,6 +9,7 @@ import logging
 class Exception(Exception):
     '''Undefined Fusion exception'''
 
+
 class LoginFailed(Exception):
     '''Login failed. Verify user and password of Northbound API account.'''
 
@@ -16,7 +17,9 @@ class LoginFailed(Exception):
 class FrequencyLimit(Exception):
     '''(407) The interface access frequency is too high.'''
 
-# TODO    401 You do not have the related data interface permission.
+
+class Permission(Exception):
+    '''(401) You do not have the related data interface permission.'''
 
 
 # Internal exceptions, should not get out of module implementation
@@ -32,6 +35,7 @@ class _305_NotLogged(_InternalException):
 def FailCodeToException(body):
     switcher = {
         305: _305_NotLogged,  # You are not in the login state.
+        401: Permission,  # You do not have the related interface permission.
         407: FrequencyLimit,  # The interface access frequency is too high.
         20001: LoginFailed,  # The third-party system ID does not exist.
         20002: LoginFailed,  # The third-party system is forbidden.
@@ -41,5 +45,6 @@ def FailCodeToException(body):
 
     # Returns the exception matching failCode, or FusionException by default
     failCode = body.get('failCode', 0)
-    logging.debug('failCode ' + str(failCode) + ' received with body: ' + str(body))
+    logging.debug('failCode ' + str(failCode) +
+                  ' received with body: ' + str(body))
     return switcher.get(failCode, _InternalException)(body)
