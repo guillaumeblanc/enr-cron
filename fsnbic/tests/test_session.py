@@ -8,7 +8,7 @@ import functools
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 import fsnbic
 
-from fsnbic.tests.test_utils import *
+from fsnbic.tests.utils import *
 
 class TestSession(unittest.TestCase):
 

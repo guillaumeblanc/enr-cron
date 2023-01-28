@@ -1,5 +1,6 @@
 import logging
 import os
+import itertools
 
 from . import session
 from . import exception
@@ -15,14 +16,21 @@ class Client:
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
 
-    def get_plant_list(self) -> dict :
+    def get_plant_list(self) -> list :
         '''
         Get basic plants information.
         Implementation wraps a call to the Plant List Interface, see https://support.huawei.com/enterprise/en/doc/EDOC1100261860/4217ab29/plant-list-interface
+        This implementation will query all available pages
         '''
-        return self.session.post(endpoint='getStationList')['data']
+        plants = []
+        for page in itertools.count(start=1):
+            param = {'pageNo': page, 'pageSize': 100}
+            data = self.session.post(endpoint='getStationList', json=param)['data']
+            plants = plants + data['list']
+            if page >= data['pageCount']:
+                return plants
 
-    def get_plant_data(self, plants) -> dict :  # : list(str)
+    def get_plant_data(self, plants) -> dict :
         '''
         Get real-time plant data by plant ID set.
         Implementation wraps a call to the Plant Data Interfaces, see https://support.huawei.com/enterprise/en/doc/EDOC1100261860/cf4fb068/plant-data-interfaces
