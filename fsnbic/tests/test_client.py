@@ -1,14 +1,17 @@
+
 import os
 import sys
+import datetime
 import logging
 import unittest
 import functools
 
 # Needs add fsnbic parent to path to allow absolute import
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-import fsnbic
+sys.path.insert(0, os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '../..')))
 
 from fsnbic.tests.utils import *
+import fsnbic
 
 class TestClient(unittest.TestCase):
 
@@ -39,7 +42,8 @@ class TestClient(unittest.TestCase):
     def test_request(self):
         with fsnbic.Client(session=self.session) as client:
             plants = client.get_plant_list()
-            client.get_plant_data(list())
+            client.get_plant_realtime_data(['aaaaaaaaaaa', 'bbbbbbbbbbbb', 'cccccccccccc'])
+            client.get_plant_hourly_data(['aaaaaaaaaaa', 'bbbbbbbbbbbb', 'cccccccccccc'], date=datetime.datetime.now())
 
 
 if __name__ == '__main__':

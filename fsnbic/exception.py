@@ -32,7 +32,9 @@ class _305_NotLogged(_InternalException):
     '''You are not in the login state. You need to log in again.'''
 
 
-def FailCodeToException(body):
+def _FailCodeToException(body):
+    # Any exception to return to user space must be properly declared in the switcher,
+    # otherwise an _InternalException exception is returned.
     switcher = {
         305: _305_NotLogged,  # You are not in the login state.
         401: Permission,  # You do not have the related interface permission.
@@ -40,11 +42,12 @@ def FailCodeToException(body):
         20001: LoginFailed,  # The third-party system ID does not exist.
         20002: LoginFailed,  # The third-party system is forbidden.
         20003: LoginFailed,  # The third-party system has expired.
+        20618: FrequencyLimit, # Maximum number of calls per user per day.
         30029: LoginFailed,  # Authentication failed.
     }
 
-    # Returns the exception matching failCode, or FusionException by default
+    # Returns the exception matching failCode, or _InternalException by default
     failCode = body.get('failCode', 0)
     logging.debug('failCode ' + str(failCode) +
                   ' received with body: ' + str(body))
-    return switcher.get(failCode, _InternalException)(failCode, body)
+    return switcher.get(failCode, _InternalException)(failCode, body.get('message', 'No message.'))

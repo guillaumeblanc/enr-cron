@@ -1,0 +1,100 @@
+{
+    "success": true,
+    "data": [
+        {
+            "dataItemMap": {
+                "radiation_intensity": null,
+                "theory_power": null,
+                "inverter_power": 0,
+                "ongrid_power": null,
+                "power_profit": 0
+            },
+            "stationCode": "5D02E8B40AD342159AC8D8A2BCD4FAB5",
+            "collectTime": 1501862400000
+        },
+        {
+            "dataItemMap": {
+                "radiation_intensity": null,
+                "theory_power": null,
+                "inverter_power": 0,
+                "ongrid_power": null,
+                "power_profit": 0
+            },
+            "stationCode": "5D02E8B40AD342159AC8D8A2BCD4FAB5",
+            "collectTime": 1501866000000
+        },
+        {
+            "dataItemMap": {
+                "radiation_intensity": null,
+                "theory_power": null,
+                "inverter_power": 0,
+                "ongrid_power": null,
+                "power_profit": 0
+            },
+            "stationCode": "BA4372D08E014822AB065017416F254C",
+            "collectTime": 1501873200000
+        },
+        {
+            "dataItemMap": {
+                "radiation_intensity": null,
+                "theory_power": null,
+                "inverter_power": 0,
+                "ongrid_power": null,
+                "power_profit": 0
+            },
+            "stationCode": "5D02E8B40AD342159AC8D8A2BCD4FAB5",
+            "collectTime": 1501876800000
+        },
+        {
+            "dataItemMap": {
+                "radiation_intensity": null,
+                "theory_power": null,
+                "inverter_power": 0,
+                "ongrid_power": null,
+                "power_profit": 0
+            },
+            "stationCode": "5D02E8B40AD342159AC8D8A2BCD4FAB5",
+            "collectTime": 1501880400000
+        },
+        {
+            "dataItemMap": {
+                "radiation_intensity": null,
+                "theory_power": null,
+                "inverter_power": 0,
+                "ongrid_power": null,
+                "power_profit": 0
+            },
+            "stationCode": "5D02E8B40AD342159AC8D8A2BCD4FAB5",
+            "collectTime": 1501884000000
+        },
+        {
+            "dataItemMap": {
+                "radiation_intensity": null,
+                "theory_power": null,
+                "inverter_power": 0,
+                "ongrid_power": null,
+                "power_profit": 0
+            },
+            "stationCode": "5D02E8B40AD342159AC8D8A2BCD4FAB5",
+            "collectTime": 1501887600000
+        },
+        {
+            "dataItemMap": {
+                "radiation_intensity": null,
+                "theory_power": null,
+                "inverter_power": 0,
+                "ongrid_power": null,
+                "power_profit": 0
+            },
+            "stationCode": "BA4372D08E014822AB065017416F254C",
+            "collectTime": 1501887600000
+        }
+    ],
+    "failCode": 0,
+    "params": {
+        "stationCodes": "BA4372D08E014822AB065017416F254C,5D02E8B40AD342159AC8D8A2BCD4FAB5",
+        "collectTime": 1501862400000,
+        "currentTime": 1503046597854
+    },
+    "message": null
+}

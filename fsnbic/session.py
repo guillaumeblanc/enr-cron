@@ -35,7 +35,7 @@ def validate(func):
         response = func(*args, **kwargs)
         body = response.json()
         if not body.get('success', False):
-            raise exception.FailCodeToException(body)
+            raise exception._FailCodeToException(body)
         return response, body
     return wrap
 
@@ -76,12 +76,6 @@ class Session:
     @exceptions_sanity
     def logout(self) -> None:
         '''Logout from base url'''
-        '''
-        try:
-            self._raw_post('logout')
-        except _305_NotLogged:
-            pass  # Already logout
-        '''
         self.session = requests.session()
 
     @exceptions_sanity
@@ -94,7 +88,7 @@ class Session:
         try:
             # Posts login request
             self.session.cookies.clear()
-            response, body = self._raw_post(endpoint='login', json={
+            response, body = self._raw_post(endpoint='login', parameters={
                 'userName': self.user, 'systemCode': self.password})
             # Login succeeded, stores authentication token
             self.session.headers.update(
@@ -109,21 +103,15 @@ class Session:
 
     @exceptions_sanity  # Must be the first decorator.
     @logged
-    def post(self, endpoint, json={}) -> None:
+    def post(self, endpoint, parameters={}) :
         '''Executes POST request'''
-        response, body = self._raw_post(endpoint, json)
+        response, body = self._raw_post(endpoint, parameters)
         return body
 
     @validate
-    def _raw_post(self, endpoint, json={}) -> requests.Response:
+    def _raw_post(self, endpoint, parameters={}) -> requests.Response:
         '''Executes POST request'''
-        response = self.session.post(
-            url=self.base_url + endpoint, json=json)
+        response = self.session.post(url=self.base_url + endpoint, json=parameters)
         response.raise_for_status()
         return response
 
-    def get_plant_list(self):
-        # response, body = self.session.post(endpoint='getStationList')
-        # return body.get('data')
-        with open('fusionsolar/test_plant_list.json') as json_file:
-            return json.load(json_file)['data']['list']
